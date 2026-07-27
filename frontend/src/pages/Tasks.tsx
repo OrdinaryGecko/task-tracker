@@ -1,0 +1,456 @@
+import { useState, useEffect } from 'react';
+import { format, parseISO } from 'date-fns';
+import {
+  CalendarIcon,
+  Plus,
+  Pencil,
+  Trash2,
+  Circle,
+  CircleDashed,
+  CheckCircle2,
+  Lock,
+} from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import api, { Task, Category } from '@/services/api';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
+import { Label } from '@/components/ui/label';
+import { Badge } from '@/components/ui/badge';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
+
+const STATUS_META: Record<string, { label: string; icon: any; className: string }> = {
+  todo: { label: 'Todo', icon: Circle, className: 'bg-muted text-foreground' },
+  doing: { label: 'Doing', icon: CircleDashed, className: 'bg-warning/20 text-foreground' },
+  done: { label: 'Done', icon: CheckCircle2, className: 'bg-success/20 text-foreground' },
+};
+
+function isOverdue(dueDate: string) {
+  return new Date(dueDate) < new Date();
+}
+
+export default function Tasks() {
+  const { user } = useAuth();
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [filter, setFilter] = useState<string>('All');
+  const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<Task | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  async function fetchData() {
+    try {
+      const [tasksRes, categoriesRes] = await Promise.all([
+        api.get('/tasks'),
+        api.get('/categories'),
+      ]);
+      setTasks(tasksRes.data.tasks);
+      setCategories(categoriesRes.data.categories);
+    } catch (error) {
+      toast.error('Failed to fetch data');
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  const userTasks = tasks.filter((t) => t.userId === user?.id);
+
+  const filtered = userTasks
+    .filter((t) => filter === 'All' || t.status === filter)
+    .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
+
+  const counts = {
+    All: userTasks.length,
+    todo: userTasks.filter((t) => t.status === 'todo').length,
+    doing: userTasks.filter((t) => t.status === 'doing').length,
+    done: userTasks.filter((t) => t.status === 'done').length,
+    overdue: userTasks.filter((t) => t.status !== 'done' && isOverdue(t.dueDate)).length,
+  };
+
+  function onCreate() {
+    setEditing(null);
+    setOpen(true);
+  }
+
+  function onEdit(t: Task) {
+    setEditing(t);
+    setOpen(true);
+  }
+
+  async function onDelete(id: string) {
+    if (!confirm('Are you sure you want to delete this task?')) return;
+
+    try {
+      await api.delete(`/tasks/${id}`);
+      setTasks(tasks.filter((t) => t.id !== id));
+      toast.success('Task deleted');
+    } catch (error) {
+      toast.error('Failed to delete task');
+    }
+  }
+
+  async function onStatusChange(id: string, status: string) {
+    try {
+      const res = await api.patch(`/tasks/${id}/status`, { status });
+      setTasks(tasks.map((t) => (t.id === id ? res.data.task : t)));
+      toast.success(`Marked ${status}`);
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Failed to update status');
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <div className="p-6 md:p-10 max-w-6xl mx-auto">
+        <div className="animate-pulse space-y-4">
+          <div className="h-8 bg-muted rounded w-1/3"></div>
+          <div className="h-4 bg-muted rounded w-1/2"></div>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6 md:p-10 max-w-6xl mx-auto">
+      <header className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p className="text-sm text-muted-foreground">Hi {user?.name.split(' ')[0]} 👋</p>
+          <h1 className="text-3xl md:text-4xl font-display font-semibold mt-1">Your tasks</h1>
+        </div>
+        <Button onClick={onCreate} className="bg-accent text-accent-foreground hover:bg-accent/90">
+          <Plus className="h-4 w-4 mr-1" /> New task
+        </Button>
+      </header>
+
+      <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
+        <StatCard label="Total" value={counts.All} />
+        <StatCard label="In progress" value={counts.doing} />
+        <StatCard label="Completed" value={counts.done} />
+        <StatCard label="Overdue" value={counts.overdue} tone="destructive" />
+      </div>
+
+      <div className="mt-8 flex gap-2 flex-wrap">
+        {(['All', 'todo', 'doing', 'done'] as const).map((s) => (
+          <button
+            key={s}
+            onClick={() => setFilter(s)}
+            className={cn(
+              'px-3 py-1.5 rounded-full text-sm border transition-colors',
+              filter === s
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'bg-background hover:border-accent'
+            )}
+          >
+            {s === 'All' ? 'All' : STATUS_META[s].label}{' '}
+            <span className="ml-1 text-xs opacity-70">{counts[s === 'All' ? 'All' : s]}</span>
+          </button>
+        ))}
+      </div>
+
+      <div className="mt-6 space-y-3">
+        {filtered.length === 0 ? (
+          <div className="rounded-xl border border-dashed p-12 text-center">
+            <div className="mx-auto h-12 w-12 rounded-full bg-accent/10 flex items-center justify-center mb-3">
+              <Plus className="h-5 w-5 text-accent" />
+            </div>
+            <div className="font-medium">Nothing here yet</div>
+            <p className="text-sm text-muted-foreground mt-1">
+              Create your first task to get started.
+            </p>
+            <Button
+              onClick={onCreate}
+              className="mt-4 bg-accent text-accent-foreground hover:bg-accent/90"
+            >
+              New task
+            </Button>
+          </div>
+        ) : (
+          filtered.map((t) => {
+            const cat = categories.find((c) => c.id === t.categoryId);
+            const overdue = isOverdue(t.dueDate);
+            const locked = overdue && t.status !== 'done';
+            const StatusIcon = STATUS_META[t.status]?.icon || Circle;
+            return (
+              <div
+                key={t.id}
+                className="group rounded-xl border bg-card p-4 md:p-5 hover:border-accent/50 transition-colors"
+              >
+                <div className="flex items-start gap-4">
+                  <div className="mt-0.5">
+                    <StatusIcon className="h-5 w-5 text-muted-foreground" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <h3
+                        className={cn(
+                          'font-medium truncate',
+                          t.status === 'done' && 'line-through text-muted-foreground'
+                        )}
+                      >
+                        {t.title}
+                      </h3>
+                      {cat && (
+                        <Badge variant="outline" className="border-0">
+                          {cat.name}
+                        </Badge>
+                      )}
+                      {overdue && t.status !== 'done' && (
+                        <Badge variant="destructive">Overdue</Badge>
+                      )}
+                    </div>
+                    {t.description && (
+                      <p className="text-sm text-muted-foreground mt-1">{t.description}</p>
+                    )}
+                    <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                      <span className="inline-flex items-center gap-1">
+                        <CalendarIcon className="h-3.5 w-3.5" /> Due{' '}
+                        {format(parseISO(t.dueDate), 'MMM d, yyyy')}
+                      </span>
+                      {locked && (
+                        <span className="inline-flex items-center gap-1 text-destructive">
+                          <Lock className="h-3.5 w-3.5" /> Status locked (past due date)
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Select
+                      value={t.status}
+                      disabled={locked}
+                      onValueChange={(v) => onStatusChange(t.id, v)}
+                    >
+                      <SelectTrigger
+                        className={cn('h-8 w-[110px] text-xs', STATUS_META[t.status]?.className)}
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="todo">Todo</SelectItem>
+                        <SelectItem value="doing">Doing</SelectItem>
+                        <SelectItem value="done">Done</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <Button variant="ghost" size="icon" onClick={() => onEdit(t)}>
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                    <Button variant="ghost" size="icon" onClick={() => onDelete(t.id)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      <TaskDialog
+        open={open}
+        onOpenChange={setOpen}
+        editing={editing}
+        categories={categories}
+        onSaved={() => fetchData()}
+      />
+    </div>
+  );
+}
+
+function StatCard({ label, value, tone }: { label: string; value: number; tone?: 'destructive' }) {
+  return (
+    <div className="rounded-xl border bg-card p-4">
+      <div className="text-xs text-muted-foreground">{label}</div>
+      <div
+        className={cn(
+          'mt-1 text-2xl font-display font-semibold',
+          tone === 'destructive' && value > 0 && 'text-destructive'
+        )}
+      >
+        {value}
+      </div>
+    </div>
+  );
+}
+
+function TaskDialog({
+  open,
+  onOpenChange,
+  editing,
+  categories,
+  onSaved,
+}: {
+  open: boolean;
+  onOpenChange: (v: boolean) => void;
+  editing: Task | null;
+  categories: Category[];
+  onSaved: () => void;
+}) {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [status, setStatus] = useState('todo');
+  const [dueDate, setDueDate] = useState<Date | undefined>(new Date());
+  const [categoryId, setCategoryId] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      if (editing) {
+        setTitle(editing.title);
+        setDescription(editing.description || '');
+        setStatus(editing.status);
+        setDueDate(parseISO(editing.dueDate));
+        setCategoryId(editing.categoryId || '');
+      } else {
+        setTitle('');
+        setDescription('');
+        setStatus('todo');
+        setDueDate(new Date());
+        setCategoryId(categories[0]?.id || '');
+      }
+    }
+  }, [open, editing, categories]);
+
+  async function onSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!title.trim()) return toast.error('Give your task a title');
+    if (!dueDate) return toast.error('Pick a due date');
+
+    setIsLoading(true);
+    try {
+      const payload = {
+        title: title.trim(),
+        description,
+        status,
+        dueDate: dueDate.toISOString(),
+        categoryId: categoryId || null,
+      };
+
+      if (editing) {
+        await api.put(`/tasks/${editing.id}`, payload);
+        toast.success('Task updated');
+      } else {
+        await api.post('/tasks', payload);
+        toast.success('Task added');
+      }
+      onSaved();
+      onOpenChange(false);
+    } catch (error: any) {
+      toast.error(error.response?.data?.error || 'Failed to save task');
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="font-display">
+            {editing ? 'Edit task' : 'New task'}
+          </DialogTitle>
+        </DialogHeader>
+        <form onSubmit={onSubmit} className="space-y-4">
+          <div className="space-y-2">
+            <Label>Title</Label>
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Write a launch announcement"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Description</Label>
+            <Textarea
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Optional notes…"
+              rows={3}
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-2">
+              <Label>Status</Label>
+              <Select value={status} onValueChange={setStatus}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="todo">Todo</SelectItem>
+                  <SelectItem value="doing">Doing</SelectItem>
+                  <SelectItem value="done">Done</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <Label>Category</Label>
+              <Select value={categoryId} onValueChange={setCategoryId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose…" />
+                </SelectTrigger>
+                <SelectContent>
+                  {categories.map((c) => (
+                    <SelectItem key={c.id} value={c.id}>
+                      {c.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="space-y-2">
+            <Label>Due date</Label>
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="w-full justify-start font-normal">
+                  <CalendarIcon className="h-4 w-4 mr-2" />
+                  {dueDate ? format(dueDate, 'PPP') : 'Pick a date'}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={dueDate}
+                  onSelect={setDueDate}
+                  initialFocus
+                  className="p-3 pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              className="bg-accent text-accent-foreground hover:bg-accent/90"
+              disabled={isLoading}
+            >
+              {isLoading ? 'Saving...' : editing ? 'Save changes' : 'Add task'}
+            </Button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
