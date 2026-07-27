@@ -1,15 +1,6 @@
 import { useState, useEffect } from 'react';
 import { format, parseISO } from 'date-fns';
-import {
-  CalendarIcon,
-  Plus,
-  Pencil,
-  Trash2,
-  Circle,
-  CircleDashed,
-  CheckCircle2,
-  Lock,
-} from 'lucide-react';
+import { CalendarIcon, Plus, Pencil, Trash2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import api, { Task, Category } from '@/services/api';
 import { Button } from '@/components/ui/button';
@@ -33,14 +24,14 @@ import {
 } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-
-const STATUS_META: Record<string, { label: string; icon: any; className: string }> = {
-  todo: { label: 'Todo', icon: Circle, className: 'bg-muted text-foreground' },
-  doing: { label: 'Doing', icon: CircleDashed, className: 'bg-warning/20 text-foreground' },
-  done: { label: 'Done', icon: CheckCircle2, className: 'bg-success/20 text-foreground' },
-};
 
 function isOverdue(dueDate: string) {
   return new Date(dueDate) < new Date();
@@ -132,147 +123,166 @@ export default function Tasks() {
   }
 
   return (
-    <div className="p-6 md:p-10 max-w-6xl mx-auto">
-      <header className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-sm text-muted-foreground">Hi {user?.name.split(' ')[0]} 👋</p>
-          <h1 className="text-3xl md:text-4xl font-display font-semibold mt-1">Your tasks</h1>
-        </div>
-        <Button onClick={onCreate} className="bg-accent text-accent-foreground hover:bg-accent/90">
-          <Plus className="h-4 w-4 mr-1" /> New task
-        </Button>
-      </header>
-
-      <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
-        <StatCard label="Total" value={counts.All} />
-        <StatCard label="In progress" value={counts.doing} />
-        <StatCard label="Completed" value={counts.done} />
-        <StatCard label="Overdue" value={counts.overdue} tone="destructive" />
-      </div>
-
-      <div className="mt-8 flex gap-2 flex-wrap">
-        {(['All', 'todo', 'doing', 'done'] as const).map((s) => (
-          <button
-            key={s}
-            onClick={() => setFilter(s)}
-            className={cn(
-              'px-3 py-1.5 rounded-full text-sm border transition-colors',
-              filter === s
-                ? 'bg-primary text-primary-foreground border-primary'
-                : 'bg-background hover:border-accent'
-            )}
-          >
-            {s === 'All' ? 'All' : STATUS_META[s].label}{' '}
-            <span className="ml-1 text-xs opacity-70">{counts[s === 'All' ? 'All' : s]}</span>
-          </button>
-        ))}
-      </div>
-
-      <div className="mt-6 space-y-3">
-        {filtered.length === 0 ? (
-          <div className="rounded-xl border border-dashed p-12 text-center">
-            <div className="mx-auto h-12 w-12 rounded-full bg-accent/10 flex items-center justify-center mb-3">
-              <Plus className="h-5 w-5 text-accent" />
-            </div>
-            <div className="font-medium">Nothing here yet</div>
-            <p className="text-sm text-muted-foreground mt-1">
-              Create your first task to get started.
-            </p>
-            <Button
-              onClick={onCreate}
-              className="mt-4 bg-accent text-accent-foreground hover:bg-accent/90"
-            >
-              New task
-            </Button>
+    <TooltipProvider>
+      <div className="p-6 md:p-10 max-w-6xl mx-auto">
+        <header className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-sm text-muted-foreground">Hi {user?.name.split(' ')[0]} 👋</p>
+            <h1 className="text-3xl md:text-4xl font-display font-semibold mt-1">Your tasks</h1>
           </div>
-        ) : (
-          filtered.map((t) => {
-            const cat = categories.find((c) => c.id === t.categoryId);
-            const overdue = isOverdue(t.dueDate);
-            const locked = overdue && t.status !== 'done';
-            const StatusIcon = STATUS_META[t.status]?.icon || Circle;
-            return (
-              <div
-                key={t.id}
-                className="group rounded-xl border bg-card p-4 md:p-5 hover:border-accent/50 transition-colors"
+          <Button onClick={onCreate} className="bg-accent text-accent-foreground hover:bg-accent/90">
+            <Plus className="h-4 w-4 mr-1" /> New task
+          </Button>
+        </header>
+
+        <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
+          <StatCard label="Total" value={counts.All} />
+          <StatCard label="In progress" value={counts.doing} />
+          <StatCard label="Completed" value={counts.done} />
+          <StatCard label="Overdue" value={counts.overdue} tone="destructive" />
+        </div>
+
+        <div className="mt-8 flex gap-2 flex-wrap">
+          {(['All', 'todo', 'doing', 'done'] as const).map((s) => (
+            <button
+              key={s}
+              onClick={() => setFilter(s)}
+              className={cn(
+                'px-3 py-1.5 rounded-full text-sm border transition-colors',
+                filter === s
+                  ? 'bg-primary text-primary-foreground border-primary'
+                  : 'bg-background hover:border-accent'
+              )}
+            >
+              {s === 'All' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}{' '}
+              <span className="ml-1 text-xs opacity-70">{counts[s === 'All' ? 'All' : s]}</span>
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-6 space-y-3">
+          {filtered.length === 0 ? (
+            <div className="rounded-xl border border-dashed p-12 text-center">
+              <div className="mx-auto h-12 w-12 rounded-full bg-accent/10 flex items-center justify-center mb-3">
+                <Plus className="h-5 w-5 text-accent" />
+              </div>
+              <div className="font-medium">Nothing here yet</div>
+              <p className="text-sm text-muted-foreground mt-1">
+                Create your first task to get started.
+              </p>
+              <Button
+                onClick={onCreate}
+                className="mt-4 bg-accent text-accent-foreground hover:bg-accent/90"
               >
-                <div className="flex items-start gap-4">
-                  <div className="mt-0.5">
-                    <StatusIcon className="h-5 w-5 text-muted-foreground" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3
-                        className={cn(
-                          'font-medium truncate',
-                          t.status === 'done' && 'line-through text-muted-foreground'
+                New task
+              </Button>
+            </div>
+          ) : (
+            filtered.map((t) => {
+              const cat = categories.find((c) => c.id === t.categoryId);
+              const overdue = isOverdue(t.dueDate);
+              const locked = overdue;
+              return (
+                <div
+                  key={t.id}
+                  className="group rounded-xl border bg-card p-4 md:p-5 hover:border-accent/50 transition-colors"
+                >
+                  <div className="flex items-start gap-4">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <h3
+                          className={cn(
+                            'font-medium truncate',
+                            t.status === 'done' && 'line-through text-muted-foreground'
+                          )}
+                        >
+                          {t.title}
+                        </h3>
+                        {cat && (
+                          <Badge variant="outline" className="border-0">
+                            {cat.name}
+                          </Badge>
                         )}
-                      >
-                        {t.title}
-                      </h3>
-                      {cat && (
-                        <Badge variant="outline" className="border-0">
-                          {cat.name}
-                        </Badge>
+                        {overdue && t.status !== 'done' && (
+                          <Badge variant="destructive">Overdue</Badge>
+                        )}
+                      </div>
+                      {t.description && (
+                        <p className="text-sm text-muted-foreground mt-1">{t.description}</p>
                       )}
-                      {overdue && t.status !== 'done' && (
-                        <Badge variant="destructive">Overdue</Badge>
-                      )}
-                    </div>
-                    {t.description && (
-                      <p className="text-sm text-muted-foreground mt-1">{t.description}</p>
-                    )}
-                    <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                      <span className="inline-flex items-center gap-1">
-                        <CalendarIcon className="h-3.5 w-3.5" /> Due{' '}
-                        {format(parseISO(t.dueDate), 'MMM d, yyyy')}
-                      </span>
-                      {locked && (
-                        <span className="inline-flex items-center gap-1 text-destructive">
-                          <Lock className="h-3.5 w-3.5" /> Status locked (past due date)
+                      <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                        <span className="inline-flex items-center gap-1">
+                          <CalendarIcon className="h-3.5 w-3.5" /> Due{' '}
+                          {format(parseISO(t.dueDate), 'MMM d, yyyy · h:mm a')}
                         </span>
-                      )}
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Select
-                      value={t.status}
-                      disabled={locked}
-                      onValueChange={(v) => onStatusChange(t.id, v)}
-                    >
-                      <SelectTrigger
-                        className={cn('h-8 w-[110px] text-xs', STATUS_META[t.status]?.className)}
-                      >
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="todo">Todo</SelectItem>
-                        <SelectItem value="doing">Doing</SelectItem>
-                        <SelectItem value="done">Done</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    <Button variant="ghost" size="icon" onClick={() => onEdit(t)}>
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                    <Button variant="ghost" size="icon" onClick={() => onDelete(t.id)}>
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      {locked ? (
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div className="opacity-40 cursor-not-allowed">
+                              <div
+                                className={cn(
+                                  'h-8 w-[110px] text-xs flex items-center px-3 rounded-md border',
+                                  t.status === 'todo' && 'bg-muted text-foreground',
+                                  t.status === 'doing' && 'bg-amber-100 text-amber-900',
+                                  t.status === 'done' && 'bg-green-100 text-green-900'
+                                )}
+                              >
+                                {t.status === 'todo' ? 'Todo' : t.status === 'doing' ? 'Doing' : 'Done'}
+                              </div>
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Status locked — past due date</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      ) : (
+                        <Select
+                          value={t.status}
+                          onValueChange={(v) => onStatusChange(t.id, v)}
+                        >
+                          <SelectTrigger
+                            className={cn(
+                              'h-8 w-[110px] text-xs',
+                              t.status === 'todo' && 'bg-muted text-foreground',
+                              t.status === 'doing' && 'bg-amber-100 text-amber-900',
+                              t.status === 'done' && 'bg-green-100 text-green-900'
+                            )}
+                          >
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="todo">Todo</SelectItem>
+                            <SelectItem value="doing">Doing</SelectItem>
+                            <SelectItem value="done">Done</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
+                      <Button variant="ghost" size="icon" onClick={() => onEdit(t)}>
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => onDelete(t.id)}>
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          })
-        )}
-      </div>
+              );
+            })
+          )}
+        </div>
 
-      <TaskDialog
-        open={open}
-        onOpenChange={setOpen}
-        editing={editing}
-        categories={categories}
-        onSaved={() => fetchData()}
-      />
-    </div>
+        <TaskDialog
+          open={open}
+          onOpenChange={setOpen}
+          editing={editing}
+          categories={categories}
+          onSaved={() => fetchData()}
+        />
+      </div>
+    </TooltipProvider>
   );
 }
 
@@ -309,6 +319,7 @@ function TaskDialog({
   const [description, setDescription] = useState('');
   const [status, setStatus] = useState('todo');
   const [dueDate, setDueDate] = useState<Date | undefined>(new Date());
+  const [dueTime, setDueTime] = useState('17:00');
   const [categoryId, setCategoryId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
@@ -318,13 +329,16 @@ function TaskDialog({
         setTitle(editing.title);
         setDescription(editing.description || '');
         setStatus(editing.status);
-        setDueDate(parseISO(editing.dueDate));
+        const parsed = parseISO(editing.dueDate);
+        setDueDate(parsed);
+        setDueTime(format(parsed, 'HH:mm'));
         setCategoryId(editing.categoryId || '');
       } else {
         setTitle('');
         setDescription('');
         setStatus('todo');
         setDueDate(new Date());
+        setDueTime('17:00');
         setCategoryId(categories[0]?.id || '');
       }
     }
@@ -337,11 +351,15 @@ function TaskDialog({
 
     setIsLoading(true);
     try {
+      const [hours, minutes] = dueTime.split(':').map(Number);
+      const combined = new Date(dueDate);
+      combined.setHours(hours, minutes, 0, 0);
+
       const payload = {
         title: title.trim(),
         description,
         status,
-        dueDate: dueDate.toISOString(),
+        dueDate: combined.toISOString(),
         categoryId: categoryId || null,
       };
 
@@ -418,24 +436,32 @@ function TaskDialog({
             </div>
           </div>
           <div className="space-y-2">
-            <Label>Due date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button variant="outline" className="w-full justify-start font-normal">
-                  <CalendarIcon className="h-4 w-4 mr-2" />
-                  {dueDate ? format(dueDate, 'PPP') : 'Pick a date'}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0" align="start">
-                <Calendar
-                  mode="single"
-                  selected={dueDate}
-                  onSelect={setDueDate}
-                  initialFocus
-                  className="p-3 pointer-events-auto"
-                />
-              </PopoverContent>
-            </Popover>
+            <Label>Due date & time</Label>
+            <div className="flex gap-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="outline" className="flex-1 justify-start font-normal">
+                    <CalendarIcon className="h-4 w-4 mr-2" />
+                    {dueDate ? format(dueDate, 'MMM d, yyyy') : 'Pick a date'}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={dueDate}
+                    onSelect={setDueDate}
+                    initialFocus
+                    className="p-3 pointer-events-auto"
+                  />
+                </PopoverContent>
+              </Popover>
+              <Input
+                type="time"
+                value={dueTime}
+                onChange={(e) => setDueTime(e.target.value)}
+                className="w-[120px]"
+              />
+            </div>
           </div>
           <DialogFooter>
             <Button type="button" variant="ghost" onClick={() => onOpenChange(false)}>

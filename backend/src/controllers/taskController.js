@@ -177,11 +177,7 @@ const updateTaskStatus = async (req, res) => {
       return res.status(403).json({ error: 'Access denied' });
     }
 
-    if (task.status === 'done') {
-      return res.status(400).json({ error: 'Cannot change status of completed task' });
-    }
-
-    if (isOverdue(task.dueDate) && task.status !== 'done') {
+    if (isOverdue(task.dueDate)) {
       return res.status(400).json({ error: 'Cannot change status after due date has passed' });
     }
 
