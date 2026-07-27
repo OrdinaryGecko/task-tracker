@@ -34,6 +34,9 @@ import { cn } from '@/lib/utils';
 import { getDueInLabel } from '@/lib/timeago';
 import { toast } from 'sonner';
 
+const TITLE_MAX = 100;
+const DESC_MAX = 200;
+
 function isOverdue(dueDate: string) {
   return new Date(dueDate) < new Date();
 }
@@ -196,7 +199,7 @@ export default function Tasks() {
                         )}
                       </div>
                       {t.description && (
-                        <p className="text-sm text-muted-foreground mt-1">{t.description}</p>
+                        <p className="text-sm text-muted-foreground mt-1 truncate">{t.description}</p>
                       )}
                       <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                         <span className="inline-flex items-center gap-1">
@@ -332,7 +335,7 @@ function TaskDialog({
         setStatus('todo');
         setDueDate(new Date());
         setDueTime('17:00');
-        setCategoryId(categories[0]?.id || '');
+        setCategoryId('');
       }
     }
   }, [open, editing, categories]);
@@ -342,12 +345,16 @@ function TaskDialog({
     if (!title.trim()) return toast.error('Give your task a title');
     if (!dueDate) return toast.error('Pick a due date');
 
+    const [hours, minutes] = dueTime.split(':').map(Number);
+    const combined = new Date(dueDate);
+    combined.setHours(hours, minutes, 0, 0);
+
+    if (!editing && combined < new Date()) {
+      return toast.error('Due date cannot be in the past');
+    }
+
     setIsLoading(true);
     try {
-      const [hours, minutes] = dueTime.split(':').map(Number);
-      const combined = new Date(dueDate);
-      combined.setHours(hours, minutes, 0, 0);
-
       const payload = {
         title: title.trim(),
         description,
@@ -387,6 +394,7 @@ function TaskDialog({
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="Write a launch announcement"
+              maxLength={TITLE_MAX}
             />
           </div>
           <div className="space-y-2">
@@ -396,6 +404,7 @@ function TaskDialog({
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Optional notes…"
               rows={3}
+              maxLength={DESC_MAX}
             />
           </div>
           <div className="grid grid-cols-2 gap-3">

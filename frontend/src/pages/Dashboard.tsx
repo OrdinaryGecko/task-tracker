@@ -157,7 +157,14 @@ export default function Dashboard() {
 
       <div className="mt-6 rounded-xl border bg-card overflow-hidden">
         <div className="overflow-auto max-h-[60vh]">
-          <table className="w-full text-sm">
+          <table className="w-full text-sm" style={{ tableLayout: 'fixed' }}>
+            <colgroup>
+              <col style={{ width: '35%' }} />
+              <col style={{ width: '15%' }} />
+              <col style={{ width: '15%' }} />
+              <col style={{ width: '25%' }} />
+              <col style={{ width: '10%' }} />
+            </colgroup>
             <thead className="bg-secondary/60 text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
                 <th className="text-left p-3 font-medium">Task</th>
@@ -174,18 +181,20 @@ export default function Dashboard() {
                 const overdue = t.status !== 'done' && isOverdue(t.dueDate);
                 return (
                   <tr key={t.id} className="border-t hover:bg-secondary/30">
-                    <td className="p-3">
-                      <div className="font-medium">{t.title}</div>
+                    <td className="p-3 overflow-hidden">
+                      <div className="font-medium truncate" title={t.title}>{t.title}</div>
                       {t.description && (
-                        <div className="text-xs text-muted-foreground line-clamp-1">
+                        <div className="text-xs text-muted-foreground truncate" title={t.description}>
                           {t.description}
                         </div>
                       )}
                     </td>
-                    <td className="p-3">{u?.name || '—'}</td>
-                    <td className="p-3">
+                    <td className="p-3 overflow-hidden">
+                      <span className="truncate block" title={u?.name || '—'}>{u?.name || '—'}</span>
+                    </td>
+                    <td className="p-3 overflow-hidden">
                       {c ? (
-                        <span className="inline-flex items-center gap-2">{c.name}</span>
+                        <span className="truncate block" title={c.name}>{c.name}</span>
                       ) : (
                         <span className="text-muted-foreground">Unassigned</span>
                       )}
