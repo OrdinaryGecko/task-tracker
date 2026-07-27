@@ -95,7 +95,7 @@ export default function App() {
         <Route path="/" element={<Navigate to="/tasks" replace />} />
         <Route path="*" element={<Navigate to="/tasks" replace />} />
       </Routes>
-      <Toaster position="top-right" richColors />
+      <Toaster position="bottom-right" richColors />
     </>
   );
 }
