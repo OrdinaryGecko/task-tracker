@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { format, parseISO } from 'date-fns';
-import { CalendarIcon, Plus, Pencil, Trash2 } from 'lucide-react';
+import { CalendarIcon, Clock, Plus, Pencil, Trash2 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import api, { Task, Category } from '@/services/api';
 import { Button } from '@/components/ui/button';
@@ -31,6 +31,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+import { getDueInLabel } from '@/lib/timeago';
 import { toast } from 'sonner';
 
 function isOverdue(dueDate: string) {
@@ -202,6 +203,11 @@ export default function Tasks() {
                           <CalendarIcon className="h-3.5 w-3.5" /> Due{' '}
                           {format(parseISO(t.dueDate), 'MMM d, yyyy · h:mm a')}
                         </span>
+                        {t.status !== 'done' && (
+                          <span className="inline-flex items-center gap-1">
+                            <Clock className="h-3.5 w-3.5" /> {getDueInLabel(t.dueDate)}
+                          </span>
+                        )}
                       </div>
                     </div>
                     <div className="flex items-center gap-2">

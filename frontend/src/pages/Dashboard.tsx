@@ -12,8 +12,9 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Search } from 'lucide-react';
+import { Search, Clock } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getDueInLabel } from '@/lib/timeago';
 import { toast } from 'sonner';
 
 function isOverdue(dueDate: string) {
@@ -190,7 +191,12 @@ export default function Dashboard() {
                       )}
                     </td>
                     <td className={cn('p-3', overdue && 'text-destructive font-medium')}>
-                      {format(parseISO(t.dueDate), 'MMM d, yyyy · h:mm a')}
+                      <div>{format(parseISO(t.dueDate), 'MMM d, yyyy · h:mm a')}</div>
+                      {t.status !== 'done' && (
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Clock className="h-3 w-3" /> {getDueInLabel(t.dueDate)}
+                        </div>
+                      )}
                     </td>
                     <td className="p-3">
                       <StatusBadge status={t.status} overdue={overdue} />
