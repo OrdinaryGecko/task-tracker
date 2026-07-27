@@ -190,7 +190,7 @@ export default function Dashboard() {
                       )}
                     </td>
                     <td className={cn('p-3', overdue && 'text-destructive font-medium')}>
-                      {format(parseISO(t.dueDate), 'MMM d, yyyy')}
+                      {format(parseISO(t.dueDate), 'MMM d, yyyy · h:mm a')}
                     </td>
                     <td className="p-3">
                       <StatusBadge status={t.status} overdue={overdue} />
