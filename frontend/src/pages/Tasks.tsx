@@ -159,7 +159,7 @@ export default function Tasks() {
           ))}
         </div>
 
-        <div className="mt-6 space-y-3">
+        <div className="mt-6 space-y-3 max-h-[60vh] overflow-y-auto pr-1">
           {filtered.length === 0 ? (
             <div className="rounded-xl border border-dashed p-12 text-center">
               <div className="font-medium">Nothing here yet</div>

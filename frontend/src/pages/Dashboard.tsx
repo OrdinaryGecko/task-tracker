@@ -155,7 +155,7 @@ export default function Dashboard() {
       </div>
 
       <div className="mt-6 rounded-xl border bg-card overflow-hidden">
-        <div className="overflow-x-auto">
+        <div className="overflow-auto max-h-[60vh]">
           <table className="w-full text-sm">
             <thead className="bg-secondary/60 text-xs uppercase tracking-wider text-muted-foreground">
               <tr>
