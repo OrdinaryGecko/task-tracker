@@ -34,29 +34,16 @@ export default function Register() {
       return toast.error(result.error);
     }
 
-    toast.success('Account created — welcome!');
+    toast.success('Account created!');
     navigate('/tasks');
   }
 
   return (
     <div className="min-h-screen grid md:grid-cols-2">
-      <div className="hidden md:flex flex-col justify-between p-12 bg-primary text-primary-foreground">
+      <div className="hidden md:flex flex-col justify-center p-12 bg-primary text-primary-foreground">
         <div className="flex items-center gap-2 font-display text-lg">
           <CheckSquare2 className="h-6 w-6 text-accent" />
           Task Tracker Lite
-        </div>
-        <div>
-          <h1 className="text-5xl font-display font-semibold leading-tight">
-            Start with today.
-            <br />
-            <span className="text-accent">Get to done.</span>
-          </h1>
-          <p className="mt-6 max-w-md text-primary-foreground/70">
-            Free demo — your data stays on this device.
-          </p>
-        </div>
-        <div className="text-xs text-primary-foreground/50">
-          © {new Date().getFullYear()} — Demo build
         </div>
       </div>
 
@@ -66,7 +53,6 @@ export default function Register() {
             <CheckSquare2 className="h-6 w-6 text-accent" /> Task Tracker Lite
           </div>
           <h2 className="text-3xl font-display font-semibold">Create account</h2>
-          <p className="mt-2 text-sm text-muted-foreground">A few details to get you set up.</p>
 
           <form onSubmit={onSubmit} className="mt-8 space-y-4">
             <div className="space-y-2">

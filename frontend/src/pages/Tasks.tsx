@@ -127,8 +127,7 @@ export default function Tasks() {
       <div className="p-6 md:p-10 max-w-6xl mx-auto">
         <header className="flex flex-wrap items-end justify-between gap-4">
           <div>
-            <p className="text-sm text-muted-foreground">Hi {user?.name.split(' ')[0]} 👋</p>
-            <h1 className="text-3xl md:text-4xl font-display font-semibold mt-1">Your tasks</h1>
+            <h1 className="text-3xl md:text-4xl font-display font-semibold">Your tasks</h1>
           </div>
           <Button onClick={onCreate} className="bg-accent text-accent-foreground hover:bg-accent/90">
             <Plus className="h-4 w-4 mr-1" /> New task
@@ -163,19 +162,7 @@ export default function Tasks() {
         <div className="mt-6 space-y-3">
           {filtered.length === 0 ? (
             <div className="rounded-xl border border-dashed p-12 text-center">
-              <div className="mx-auto h-12 w-12 rounded-full bg-accent/10 flex items-center justify-center mb-3">
-                <Plus className="h-5 w-5 text-accent" />
-              </div>
               <div className="font-medium">Nothing here yet</div>
-              <p className="text-sm text-muted-foreground mt-1">
-                Create your first task to get started.
-              </p>
-              <Button
-                onClick={onCreate}
-                className="mt-4 bg-accent text-accent-foreground hover:bg-accent/90"
-              >
-                New task
-              </Button>
             </div>
           ) : (
             filtered.map((t) => {

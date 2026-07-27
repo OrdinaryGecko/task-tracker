@@ -49,24 +49,10 @@ export default function Login() {
 
   return (
     <div className="min-h-screen grid md:grid-cols-2">
-      <div className="hidden md:flex flex-col justify-between p-12 bg-primary text-primary-foreground">
+      <div className="hidden md:flex flex-col justify-center p-12 bg-primary text-primary-foreground">
         <div className="flex items-center gap-2 font-display text-lg">
           <CheckSquare2 className="h-6 w-6 text-accent" />
           Task Tracker Lite
-        </div>
-        <div>
-          <h1 className="text-5xl font-display font-semibold leading-tight">
-            Small tasks.
-            <br />
-            <span className="text-accent">Big momentum.</span>
-          </h1>
-          <p className="mt-6 max-w-md text-primary-foreground/70">
-            A calm place to plan the day, sort your work into categories, and keep your team
-            unblocked — before the due date slips past.
-          </p>
-        </div>
-        <div className="text-xs text-primary-foreground/50">
-          © {new Date().getFullYear()} — Demo build
         </div>
       </div>
 
@@ -76,9 +62,6 @@ export default function Login() {
             <CheckSquare2 className="h-6 w-6 text-accent" /> Task Tracker Lite
           </div>
           <h2 className="text-3xl font-display font-semibold">Sign in</h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            Welcome back. Enter your details to continue.
-          </p>
 
           <form onSubmit={onSubmit} className="mt-8 space-y-4">
             <div className="space-y-2">

@@ -233,8 +233,8 @@ function StatusBadge({ status, overdue }: { status: string; overdue: boolean }) 
   if (overdue) return <Badge variant="destructive">Overdue</Badge>;
   const map: Record<string, string> = {
     todo: 'bg-muted text-foreground',
-    doing: 'bg-warning/20 text-foreground',
-    done: 'bg-success/20 text-foreground',
+    doing: 'bg-amber-100 text-amber-900',
+    done: 'bg-green-100 text-green-900',
   };
   return (
     <Badge className={cn('border-0', map[status])}>
