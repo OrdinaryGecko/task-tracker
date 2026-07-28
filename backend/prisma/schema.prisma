@@ -55,7 +55,7 @@ enum Role {
 
 enum Status {
   todo
-  doing
+  in_progress
   done
 
   @@map("statuses")

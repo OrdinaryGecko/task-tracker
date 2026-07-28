@@ -86,7 +86,7 @@ export default function Dashboard() {
 
       <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
         <Stat label="All tasks" value={data.stats.total} />
-        <Stat label="In progress" value={data.stats.byStatus?.doing || 0} />
+        <Stat label="In progress" value={data.stats.byStatus?.in_progress || 0} />
         <Stat label="Completed" value={data.stats.byStatus?.done || 0} />
         <Stat
           label="Overdue"
@@ -133,7 +133,7 @@ export default function Dashboard() {
             <SelectContent>
               <SelectItem value="all">All statuses</SelectItem>
               <SelectItem value="todo">Todo</SelectItem>
-              <SelectItem value="doing">Doing</SelectItem>
+              <SelectItem value="in_progress">In Progress</SelectItem>
               <SelectItem value="done">Done</SelectItem>
               <SelectItem value="overdue">Overdue</SelectItem>
             </SelectContent>
@@ -248,7 +248,7 @@ function StatusBadge({ status, overdue }: { status: string; overdue: boolean }) 
   if (overdue) return <Badge variant="destructive">Overdue</Badge>;
   const map: Record<string, string> = {
     todo: 'bg-muted text-foreground',
-    doing: 'bg-amber-100 text-amber-900',
+    in_progress: 'bg-amber-100 text-amber-900',
     done: 'bg-green-100 text-green-900',
   };
   return (

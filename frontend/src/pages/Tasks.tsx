@@ -78,7 +78,7 @@ export default function Tasks() {
   const counts = {
     All: userTasks.length,
     todo: userTasks.filter((t) => t.status === 'todo').length,
-    doing: userTasks.filter((t) => t.status === 'doing').length,
+    in_progress: userTasks.filter((t) => t.status === 'in_progress').length,
     done: userTasks.filter((t) => t.status === 'done').length,
     overdue: userTasks.filter((t) => t.status !== 'done' && isOverdue(t.dueDate)).length,
   };
@@ -140,13 +140,13 @@ export default function Tasks() {
 
         <div className="mt-6 grid grid-cols-2 md:grid-cols-4 gap-3">
           <StatCard label="Total" value={counts.All} />
-          <StatCard label="In progress" value={counts.doing} />
+          <StatCard label="In Progress" value={counts.in_progress} />
           <StatCard label="Completed" value={counts.done} />
           <StatCard label="Overdue" value={counts.overdue} tone="destructive" />
         </div>
 
         <div className="mt-8 flex gap-2 flex-wrap">
-          {(['All', 'todo', 'doing', 'done'] as const).map((s) => (
+          {(['All', 'todo', 'in_progress', 'done'] as const).map((s) => (
             <button
               key={s}
               onClick={() => setFilter(s)}
@@ -157,7 +157,7 @@ export default function Tasks() {
                   : 'bg-background hover:border-accent'
               )}
             >
-              {s === 'All' ? 'All' : s.charAt(0).toUpperCase() + s.slice(1)}{' '}
+              {s === 'All' ? 'All' : s === 'in_progress' ? 'In Progress' : s.charAt(0).toUpperCase() + s.slice(1)}{' '}
               <span className="ml-1 text-xs opacity-70">{counts[s === 'All' ? 'All' : s]}</span>
             </button>
           ))}
@@ -222,11 +222,11 @@ export default function Tasks() {
                                 className={cn(
                                   'h-8 w-[110px] text-xs flex items-center px-3 rounded-md border',
                                   t.status === 'todo' && 'bg-muted text-foreground',
-                                  t.status === 'doing' && 'bg-amber-100 text-amber-900',
+                                  t.status === 'in_progress' && 'bg-amber-100 text-amber-900',
                                   t.status === 'done' && 'bg-green-100 text-green-900'
                                 )}
                               >
-                                {t.status === 'todo' ? 'Todo' : t.status === 'doing' ? 'Doing' : 'Done'}
+                                {t.status === 'todo' ? 'Todo' : t.status === 'in_progress' ? 'In Progress' : 'Done'}
                               </div>
                             </div>
                           </TooltipTrigger>
@@ -243,7 +243,7 @@ export default function Tasks() {
                             className={cn(
                               'h-8 w-[110px] text-xs',
                               t.status === 'todo' && 'bg-muted text-foreground',
-                              t.status === 'doing' && 'bg-amber-100 text-amber-900',
+                              t.status === 'in_progress' && 'bg-amber-100 text-amber-900',
                               t.status === 'done' && 'bg-green-100 text-green-900'
                             )}
                           >
@@ -251,7 +251,7 @@ export default function Tasks() {
                           </SelectTrigger>
                           <SelectContent>
                             <SelectItem value="todo">Todo</SelectItem>
-                            <SelectItem value="doing">Doing</SelectItem>
+                            <SelectItem value="in_progress">In Progress</SelectItem>
                             <SelectItem value="done">Done</SelectItem>
                           </SelectContent>
                         </Select>
@@ -334,7 +334,7 @@ function TaskDialog({
         setDescription('');
         setStatus('todo');
         const nextHour = new Date();
-        nextHour.setHours(nextHour.getHours() + 1, 0, 0, 0);
+        nextHour.setHours(nextHour.getHours() + 6, 0, 0, 0);
         setDueDate(nextHour);
         setDueTime(format(nextHour, 'HH:mm'));
         setCategoryId('');
@@ -418,7 +418,7 @@ function TaskDialog({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="todo">Todo</SelectItem>
-                  <SelectItem value="doing">Doing</SelectItem>
+                  <SelectItem value="in_progress">In Progress</SelectItem>
                   <SelectItem value="done">Done</SelectItem>
                 </SelectContent>
               </Select>

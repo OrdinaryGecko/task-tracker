@@ -58,7 +58,7 @@ async function main() {
     {
       title: 'Ship onboarding revamp',
       description: 'Polish empty states and copy.',
-      status: 'doing',
+      status: 'in_progress',
       dueDate: addDays(2),
       userId: user.id,
       categoryId: categories[0].id,

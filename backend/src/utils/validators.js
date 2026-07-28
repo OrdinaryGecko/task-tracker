@@ -38,12 +38,12 @@ const validateTask = [
   body('title').trim().notEmpty().withMessage('Task title is required'),
   body('dueDate').isISO8601().withMessage('Valid due date is required'),
   body('categoryId').optional({ nullable: true }).isString(),
-  body('status').optional().isIn(['todo', 'doing', 'done']).withMessage('Invalid status'),
+  body('status').optional().isIn(['todo', 'in_progress', 'done']).withMessage('Invalid status'),
   handleValidationErrors,
 ];
 
 const validateStatusUpdate = [
-  body('status').isIn(['todo', 'doing', 'done']).withMessage('Invalid status'),
+  body('status').isIn(['todo', 'in_progress', 'done']).withMessage('Invalid status'),
   handleValidationErrors,
 ];
 

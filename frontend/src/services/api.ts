@@ -51,7 +51,7 @@ export interface Task {
   id: string;
   title: string;
   description: string;
-  status: 'todo' | 'doing' | 'done';
+  status: 'todo' | 'in_progress' | 'done';
   dueDate: string;
   userId: string;
   categoryId: string | null;
