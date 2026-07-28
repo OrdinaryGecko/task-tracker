@@ -42,8 +42,8 @@ A full-stack task management application with user authentication, role-based ac
 
 1. **Clone the repository**
    ```bash
-   git clone <repository-url>
-   cd task-tracker-lite
+   git clone https://github.com/OrdinaryGecko/task-tracker
+   cd task-tracker
    ```
 
 2. **Start the backend**
@@ -71,8 +71,8 @@ A full-stack task management application with user authentication, role-based ac
 
 1. **Clone and start**
    ```bash
-   git clone <repository-url>
-   cd task-tracker-lite
+   git clone https://github.com/OrdinaryGecko/task-tracker
+   cd task-tracker
    cp .env.example .env
    docker-compose up --build
    ```
