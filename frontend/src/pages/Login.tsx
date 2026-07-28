@@ -52,14 +52,14 @@ export default function Login() {
       <div className="hidden md:flex flex-col justify-center p-12 bg-primary text-primary-foreground">
         <div className="flex items-center gap-2 font-display text-lg">
           <CheckSquare2 className="h-6 w-6 text-accent" />
-          Task Tracker Lite
+          Task Tracker
         </div>
       </div>
 
       <div className="flex items-center justify-center p-6 sm:p-12">
         <div className="w-full max-w-sm">
           <div className="md:hidden mb-8 flex items-center gap-2 font-display text-lg">
-            <CheckSquare2 className="h-6 w-6 text-accent" /> Task Tracker Lite
+            <CheckSquare2 className="h-6 w-6 text-accent" /> Task Tracker
           </div>
           <h2 className="text-3xl font-display font-semibold">Sign in</h2>
 

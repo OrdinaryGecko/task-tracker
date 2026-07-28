@@ -1,4 +1,4 @@
-# Task Tracker Lite
+# Task Tracker
 
 A full-stack task management application with user authentication, role-based access control, categories, and an admin dashboard.
 
@@ -10,6 +10,10 @@ A full-stack task management application with user authentication, role-based ac
 - **Task Management**: Create, read, update, and delete tasks with status tracking
 - **Due Date Validation**: Status cannot be changed after the due date passes
 - **Admin Dashboard**: View all tasks with filtering by user, status, and due date
+
+## Demo
+
+[![Demo Video](https://img.youtube.com/vi/f-bcpoMtEfI/0.jpg)](https://youtu.be/f-bcpoMtEfI)
 
 ## Tech Stack
 
@@ -125,7 +129,7 @@ Docker ignores `backend/.env` (via `.dockerignore`), so both setups work indepen
 | `POSTGRES_USER` | PostgreSQL username | `postgres` | PostgreSQL, Backend |
 | `POSTGRES_PASSWORD` | PostgreSQL password | `postgres` | PostgreSQL, Backend |
 | `DB_PORT` | PostgreSQL port on host | `5432` | PostgreSQL |
-| `JWT_SECRET` | Secret key for JWT signing | `task-tracker-lite-secret-key` | Backend |
+| `JWT_SECRET` | Secret key for JWT signing | `task-tracker-secret-key` | Backend |
 | `JWT_EXPIRES_IN` | JWT token expiration | `24h` | Backend |
 | `PORT` | Backend API port | `3000` | Backend |
 | `FRONTEND_PORT` | Frontend port on host | `5173` | Frontend |

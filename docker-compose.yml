@@ -27,7 +27,7 @@ services:
       - "${PORT:-3000}:3000"
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-tasktracker}?schema=public
-      JWT_SECRET: ${JWT_SECRET:-task-tracker-lite-secret-key}
+      JWT_SECRET: ${JWT_SECRET:-task-tracker-secret-key}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-24h}
       PORT: 3000
     depends_on:
