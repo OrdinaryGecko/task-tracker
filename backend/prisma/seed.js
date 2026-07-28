@@ -47,6 +47,8 @@ async function main() {
 
   console.log('Created categories:', categories);
 
+  await prisma.task.deleteMany();
+
   const today = new Date();
   const addDays = (n) => {
     const d = new Date(today);
