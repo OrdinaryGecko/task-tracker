@@ -333,8 +333,10 @@ function TaskDialog({
         setTitle('');
         setDescription('');
         setStatus('todo');
-        setDueDate(new Date());
-        setDueTime('17:00');
+        const nextHour = new Date();
+        nextHour.setHours(nextHour.getHours() + 1, 0, 0, 0);
+        setDueDate(nextHour);
+        setDueTime(format(nextHour, 'HH:mm'));
         setCategoryId('');
       }
     }
