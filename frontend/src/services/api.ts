@@ -76,3 +76,12 @@ export interface DashboardResponse {
     overdue: number;
   };
 }
+
+export interface UserWithStats extends User {
+  createdAt: string;
+  _count: { tasks: number };
+}
+
+export interface UsersResponse {
+  users: UserWithStats[];
+}

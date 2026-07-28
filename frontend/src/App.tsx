@@ -6,6 +6,7 @@ import Register from './pages/Register';
 import Tasks from './pages/Tasks';
 import Categories from './pages/Categories';
 import Dashboard from './pages/Dashboard';
+import Users from './pages/Users';
 import Layout from './components/Layout';
 
 function ProtectedRoute({ children, adminOnly = false }: { children: React.ReactNode; adminOnly?: boolean }) {
@@ -89,6 +90,14 @@ export default function App() {
           element={
             <ProtectedRoute adminOnly>
               <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute adminOnly>
+              <Users />
             </ProtectedRoute>
           }
         />

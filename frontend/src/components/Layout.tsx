@@ -1,5 +1,5 @@
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { CheckSquare2, LayoutDashboard, ListTodo, Tags, LogOut } from 'lucide-react';
+import { CheckSquare2, LayoutDashboard, ListTodo, Tags, Users, LogOut } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -16,6 +16,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
     { to: '/tasks', label: 'My tasks', icon: ListTodo, show: true },
     { to: '/dashboard', label: 'Admin dashboard', icon: LayoutDashboard, show: user.role === 'admin' },
     { to: '/categories', label: 'Categories', icon: Tags, show: user.role === 'admin' },
+    { to: '/users', label: 'Users', icon: Users, show: user.role === 'admin' },
   ].filter((n) => n.show);
 
   function onLogout() {
