@@ -13,6 +13,8 @@ A full-stack task management application with user authentication, role-based ac
 
 ## Demo
 
+[Try the live demo](https://task-tracker-frontend-oxwz.onrender.com)
+
 [![Demo Video](https://img.youtube.com/vi/f-bcpoMtEfI/0.jpg)](https://youtu.be/f-bcpoMtEfI)
 
 ## Tech Stack
