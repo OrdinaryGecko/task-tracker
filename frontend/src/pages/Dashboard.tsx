@@ -252,8 +252,8 @@ function StatusBadge({ status, overdue }: { status: string; overdue: boolean }) 
     done: 'bg-green-100 text-green-900',
   };
   return (
-    <Badge className={cn('border-0', map[status])}>
-      {status.charAt(0).toUpperCase() + status.slice(1)}
+      <Badge className={cn('border-0 whitespace-nowrap', map[status])}>
+      {status === 'in_progress' ? 'In Progress' : status.charAt(0).toUpperCase() + status.slice(1)}
     </Badge>
   );
 }
