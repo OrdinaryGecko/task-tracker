@@ -111,7 +111,7 @@ export default function Tasks() {
     try {
       const res = await api.patch(`/tasks/${id}/status`, { status });
       setTasks(tasks.map((t) => (t.id === id ? res.data.task : t)));
-      toast.success(`Marked ${status}`);
+      toast.success(`Marked ${status === 'in_progress' ? 'In Progress' : status.charAt(0).toUpperCase() + status.slice(1)}`);
     } catch (error: any) {
       toast.error(error.response?.data?.error || 'Failed to update status');
     }
