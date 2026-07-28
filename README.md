@@ -74,7 +74,7 @@ A full-stack task management application with user authentication, role-based ac
    ```
 
 2. **Access the application**
-   - Frontend: http://localhost
+   - Frontend: http://localhost:5173
    - Backend API: http://localhost:3000
 
 ## API Endpoints
@@ -128,7 +128,7 @@ Docker ignores `backend/.env` (via `.dockerignore`), so both setups work indepen
 | `JWT_SECRET` | Secret key for JWT signing | `task-tracker-lite-secret-key` | Backend |
 | `JWT_EXPIRES_IN` | JWT token expiration | `24h` | Backend |
 | `PORT` | Backend API port | `3000` | Backend |
-| `FRONTEND_PORT` | Frontend port on host | `80` | Frontend |
+| `FRONTEND_PORT` | Frontend port on host | `5173` | Frontend |
 
 ## License
 
