@@ -46,6 +46,7 @@ export default function Tasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [filter, setFilter] = useState<string>('All');
+  const [hideOverdue, setHideOverdue] = useState(false);
   const [open, setOpen] = useState(false);
   const [editing, setEditing] = useState<Task | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -73,6 +74,7 @@ export default function Tasks() {
 
   const filtered = userTasks
     .filter((t) => filter === 'All' || t.status === filter)
+    .filter((t) => !hideOverdue || !isOverdue(t.dueDate))
     .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
 
   const counts = {
@@ -145,7 +147,7 @@ export default function Tasks() {
           <StatCard label="Overdue" value={counts.overdue} tone="destructive" />
         </div>
 
-        <div className="mt-8 flex gap-2 flex-wrap">
+        <div className="mt-8 flex gap-2 flex-wrap items-center">
           {(['All', 'todo', 'in_progress', 'done'] as const).map((s) => (
             <button
               key={s}
@@ -161,6 +163,17 @@ export default function Tasks() {
               <span className="ml-1 text-xs opacity-70">{counts[s === 'All' ? 'All' : s]}</span>
             </button>
           ))}
+          <button
+            onClick={() => setHideOverdue(!hideOverdue)}
+            className={cn(
+              'px-3 py-1.5 rounded-full text-sm border transition-colors',
+              hideOverdue
+                ? 'bg-destructive text-destructive-foreground border-destructive'
+                : 'bg-background hover:border-accent'
+            )}
+          >
+            {hideOverdue ? 'Show Overdue' : 'Hide Overdue'}
+          </button>
         </div>
 
         <div className="mt-6 space-y-3 max-h-[60vh] overflow-y-auto pr-1">
