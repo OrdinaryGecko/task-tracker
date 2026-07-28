@@ -46,6 +46,7 @@ A full-stack task management application with user authentication, role-based ac
    ```bash
    cd backend
    npm install
+   cp .env.example .env
    npx prisma db push
    node prisma/seed.js
    npm run dev
@@ -103,7 +104,31 @@ A full-stack task management application with user authentication, role-based ac
 
 ## Environment Variables
 
-See `.env.example` for all configurable variables.
+This project uses two separate `.env` files depending on how you run it:
+
+**Local Development** — use `backend/.env` (copy from `backend/.env.example`):
+```bash
+cd backend
+cp .env.example .env
+```
+
+**Docker Deployment** — use root `.env` (copy from `.env.example`):
+```bash
+cp .env.example .env
+```
+
+Docker ignores `backend/.env` (via `.dockerignore`), so both setups work independently without conflicts.
+
+| Variable | Description | Default | Used By |
+|----------|-------------|---------|---------|
+| `POSTGRES_DB` | PostgreSQL database name | `tasktracker` | PostgreSQL, Backend |
+| `POSTGRES_USER` | PostgreSQL username | `postgres` | PostgreSQL, Backend |
+| `POSTGRES_PASSWORD` | PostgreSQL password | `postgres` | PostgreSQL, Backend |
+| `DB_PORT` | PostgreSQL port on host | `5432` | PostgreSQL |
+| `JWT_SECRET` | Secret key for JWT signing | `task-tracker-lite-secret-key` | Backend |
+| `JWT_EXPIRES_IN` | JWT token expiration | `24h` | Backend |
+| `PORT` | Backend API port | `3000` | Backend |
+| `FRONTEND_PORT` | Frontend port on host | `80` | Frontend |
 
 ## License
 
